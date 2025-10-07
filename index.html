@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KRW → CNY Exchange Rate</title>
+<style>
+  body {font-family: Arial, sans-serif;text-align: center;margin-top: 10%;background-color: #f5f5f5;}
+  h1 {color: #333;}
+  #rate {font-size: 2em;color: #0070f3;}
+  #time {color: #777;}
+</style>
+<script>
+async function loadRate() {
+  const res = await fetch('rate.json');
+  const data = await res.json();
+  document.getElementById('rate').textContent = `1 KRW = ${data.rate} CNY`;
+  document.getElementById('time').textContent = `Last updated: ${data.updated}`;
+}
+loadRate();
+</script>
+</head>
+<body>
+  <h1>🇰🇷 → 🇨🇳 Exchange Rate</h1>
+  <p id="rate">Loading...</p>
+  <p id="time"></p>
+  <footer style="margin-top:20px;font-size:0.9em;">Data Source: GmoneyTrans</footer>
+</body>
+</html>
