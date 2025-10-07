@@ -18,23 +18,24 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 driver.get(url)
 
 # 等待页面 JS 渲染
-time.sleep(3)  # 根据需要调整等待时间
+time.sleep(3)  # 可根据实际情况调整等待时间
 
-# 直接通过 id 获取元素
-rate_text = driver.find_element("id", "rate").text
+# 使用绝对 XPath 获取汇率
+rate_text = driver.find_element("xpath", "/html/body/div[1]/div/div[5]/p[3]/span[2]").text
 
-# 解析汇率数字，例如 "1 KRW = 0.005023 CNY"
-rate = float(rate_text.split('=')[1].split()[0])
+# 解析汇率数字，例如 "0.005023"
+rate = float(rate_text)
 
-updated = datetime.datetime.当前()。strftime("%Y-%m-%d %H:%M:%S")
+updated = datetime.datetime.当前().strftime("%Y-%m-%d %H:%M:%S")
 
+# 写入 rate.json
 data = {
     "source": url,
     "rate": rate,
     "updated": updated
 }
 
-with open("rate.json", "w", encoding="utf-8") as f:
+with open("rate.json"， "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
 
 print(f"✅ KRW → CNY Exchange Rate: 1 KRW = {rate} CNY")
