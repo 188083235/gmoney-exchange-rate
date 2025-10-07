@@ -1,0 +1,1 @@
+# gmoney-exchange-rate
