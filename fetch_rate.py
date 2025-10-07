@@ -1,28 +1,38 @@
 import requests, re, json, datetime
 
-# 汇率网页
+# 汇率 API/网页
 url = "https://mapi.gmoneytrans.net/exratenew1/Default.asp?country=china"
 
-# 请求网页
-res = requests.get(url)
-res.encoding = "utf-8"
+try:
+    res = requests.get(url, timeout=10)
+    res.encoding = "utf-8"
+    html = res.text
 
-# 正则匹配 1 KRW = ? CNY
-match = re.search(r"Exchange Rate\s*[:：]?\s*1\s*KRW\s*=\s*([\d\.]+)\s*CNY", res.text, re.IGNORECASE)
-rate = float(match.group(1)) if match else None
+    # 正则匹配 Exchange Rate
+    match = re.search(r"1\s*KRW\s*=\s*([\d\.]+)\s*CNY", html)
+    if match:
+        rate = float(match.group(1))
+        updated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        rate = 无
+        updated = "N/A"
 
-# 构建输出数据
+except Exception as e:
+    print("⚠️ 请求失败:", e)
+    rate = 无
+    updated = "N/A"
+
+# 输出到 rate.json
 data = {
     "source": url,
     "rate": rate,
-    "updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    "updated": updated
 }
 
-# 写入 rate.json
 with open("rate.json", "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
 
 if rate:
-    print("✅ Updated exchange rate:", data)
+    print(f"✅ KRW → CNY Exchange Rate: 1 KRW = {rate} CNY")
 else:
-    print("⚠️ 未获取到汇率，请检查网页结构或网络连接")
+    print("⚠️ 未获取到汇率，请检查网页或接口")
