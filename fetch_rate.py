@@ -1,24 +1,33 @@
-import requests, re, json, datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import json, datetime
+import time
 
 url = "https://mapi.gmoneytrans.net/exratenew1/Default.asp?country=china"
 
-# 先定义默认值
-rate = 0
-updated = datetime.datetime。now().strftime("%Y-%m-%d %H:%M:%S")
+# Chrome 无头模式
+options = 选项()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
 
-try:
-    res = requests.get(url, timeout=10)
-    res.encoding = "utf-8"
-    html = res.text
+# 启动浏览器
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver.get(url)
 
-    match = re.search(r"1\s*KRW\s*=\s*([\d\.]+)\s*CNY", html, re.IGNORECASE)
-    if match:
-        rate = float(match.group(1))
+# 等待页面 JS 渲染
+time.sleep(3)  # 根据需要调整等待时间
 
-except Exception as e:
-    print("⚠️ 请求失败或解析失败:", e)
+# 直接通过 id 获取元素
+rate_text = driver.find_element("id", "rate").text
 
-# 无论成功失败，都写入 rate.json
+# 解析汇率数字，例如 "1 KRW = 0.005023 CNY"
+rate = float(rate_text.split('=')[1].split()[0])
+
+updated = datetime.datetime.当前()。strftime("%Y-%m-%d %H:%M:%S")
+
 data = {
     "source": url,
     "rate": rate,
@@ -28,7 +37,6 @@ data = {
 with open("rate.json", "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
 
-if rate:
-    print(f"✅ KRW → CNY Exchange Rate: 1 KRW = {rate} CNY")
-else:
-    print(f"⚠️ 未获取到汇率，已写入默认值 rate=0，updated={updated}")
+print(f"✅ KRW → CNY Exchange Rate: 1 KRW = {rate} CNY")
+
+driver.quit()
