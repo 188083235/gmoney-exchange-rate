@@ -2,8 +2,8 @@ name: Update Exchange Rate
 
 on:
   schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
+    - cron: "0 0 * * *"   # 每天 00:00 自动运行
+  workflow_dispatch:       # 手动触发
 
 jobs:
   update-rate:
@@ -29,4 +29,4 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add rate.json
-          git diff --quiet && echo "No changes" || (git commit -m "Auto update rate $(date)" && git push)
+          git diff --quiet && echo "No changes" || (git commit -m "Auto update rate $(date '+%Y-%m-%d %H:%M:%S')" && git push)
