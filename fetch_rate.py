@@ -8,7 +8,7 @@ res = requests.get(url)
 res.encoding = "utf-8"
 
 # 正则匹配 1 KRW = ? CNY
-match = re.search(r"Exchange Rate\s*:\s*1\s*KRW\s*=\s*([\d\.]+)\s*CNY", res.text, re.IGNORECASE)
+match = re.search(r"Exchange Rate\s*[:：]?\s*1\s*KRW\s*=\s*([\d\.]+)\s*CNY", res.text, re.IGNORECASE)
 rate = float(match.group(1)) if match else None
 
 # 构建输出数据
